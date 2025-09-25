@@ -11,6 +11,7 @@ import {
     LogOut,
     TrendingUp,
     Component,
+    User,
   } from 'lucide-react';
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
@@ -28,7 +29,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
     ];
   
     const bottomItems = [
-      { id: 'settings', icon: Settings, label: 'Settings', badge: null, path: '/dashboard/settings' },
+      { id: 'profile', icon: User, label: 'Profile', badge: null, path: '/dashboard/profile' },
       { id: 'logout', icon: LogOut, label: 'Logout', badge: null, path: null }, // Special handling for logout
     ];
 
