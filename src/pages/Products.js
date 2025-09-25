@@ -1,5 +1,6 @@
-import { CandlestickChart, Delete, Package, Search, Settings, Trash, Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Package, Search, Settings, Trash } from 'lucide-react';
 import React, { useState } from 'react'
+import AddProductForm from '../components/AddProductForm';
 
 const Products = () => {
   const [products, setProducts] = useState([
@@ -131,102 +132,15 @@ const Products = () => {
     image: ''
   });
 
-  const categories = ['Electronics', 'Audio', 'Components', 'Laptops', 'Tablets', 'Accessories', 'Home & Garden', 'Candles', 'Scented', 'Raw'];
   const statuses = ['Active', 'Inactive', 'Out of Stock'];
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'features') {
-      const featuresArray = value.split(',').map(f => f.trim()).filter(f => f);
-      setFormData(prev => ({
-        ...prev,
-        [name]: featuresArray
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
 
-  // Handle file upload
-  const handleImageUpload = (file) => {
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageUrl = e.target.result;
-        setImagePreview(imageUrl);
-        setFormData(prev => ({
-          ...prev,
-          image: imageUrl
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
-  // Handle drag and drop
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleImageUpload(files[0]);
-    }
-  };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
 
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-  };
 
-  // Handle file input change
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleImageUpload(file);
-    }
-  };
 
-  // Remove image
-  const removeImage = () => {
-    setImagePreview('');
-    setFormData(prev => ({
-      ...prev,
-      image: ''
-    }));
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (editingProduct) {
-      // Update existing product
-      setProducts(prev => prev.map(product => 
-        product.id === editingProduct.id 
-          ? { ...product, ...formData, price: Number(formData.price), stock: Number(formData.stock) }
-          : product
-      ));
-    } else {
-      // Add new product
-      const newProduct = {
-        id: Date.now(),
-        ...formData,
-        price: Number(formData.price),
-        stock: Number(formData.stock),
-        dateAdded: new Date().toISOString().split('T')[0]
-      };
-      setProducts(prev => [...prev, newProduct]);
-    }
-
-    resetForm();
-  };
 
   const handleEdit = (product) => {
     setEditingProduct(product);
@@ -258,33 +172,11 @@ const Products = () => {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      category: '',
-      price: '',
-      stock: '',
-      status: 'Active',
-      description: '',
-      story: '',
-      topNotes: '',
-      middleNotes: '',
-      baseNotes: '',
-      diameter: '',
-      height: '',
-      netWeight: '',
-      burnTime: '',
-      features: [],
-      image: ''
-    });
-    setImagePreview('');
-    setEditingProduct(null);
-    setShowModal(false);
-  };
+
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.category.toLowerCase().includes(searchTerm.toLowerCase());
+      product.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || product.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -303,7 +195,7 @@ const Products = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 ">Products</h1>
           <p className="text-gray-500 text-sm">Manage your store's products</p>
         </div>
         <button
@@ -349,7 +241,7 @@ const Products = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             All Products ({filteredProducts.length})
           </h3>
-          
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -371,8 +263,8 @@ const Products = () => {
                         <div className="flex items-center space-x-3">
                           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
                             {product.image ? (
-                              <img 
-                                src={product.image} 
+                              <img
+                                src={product.image}
                                 alt={product.name}
                                 className="w-full h-full object-cover"
                               />
@@ -422,7 +314,7 @@ const Products = () => {
                 })}
               </tbody>
             </table>
-            
+
             {filteredProducts.length === 0 && (
               <div className="text-center py-12">
                 <Package size={48} className="mx-auto text-gray-400 mb-4" />
@@ -437,315 +329,7 @@ const Products = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                {editingProduct ? 'Edit Product' : 'Add New Product'}
-              </h2>
-              
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Product Image Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product Image
-                  </label>
-                  
-                  {imagePreview ? (
-                    <div className="relative inline-block">
-                      <img 
-                        src={imagePreview} 
-                        alt="Product preview" 
-                        className="w-32 h-32 object-cover rounded-lg border border-gray-300"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div
-                      className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                        dragOver 
-                          ? 'border-amber-500 bg-amber-50' 
-                          : 'border-gray-300 hover:border-gray-400'
-                      }`}
-                      onDrop={handleDrop}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                    >
-                      <ImageIcon size={48} className="mx-auto text-gray-400 mb-4" />
-                      <div className="space-y-2">
-                        <p className="text-gray-600">
-                          <label htmlFor="image-upload" className="cursor-pointer text-amber-600 hover:text-amber-700">
-                            Click to upload
-                          </label> or drag and drop
-                        </p>
-                        <p className="text-sm text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                      </div>
-                      <input
-                        id="image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Basic Information */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Name *
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Category *
-                    </label>
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map(category => (
-                        <option key={category} value={category}>{category}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product Description
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows="3"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    placeholder="Brief description of the product..."
-                  />
-                </div>
-
-                {/* Story */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Product Story
-                  </label>
-                  <textarea
-                    name="story"
-                    value={formData.story}
-                    onChange={handleInputChange}
-                    rows="4"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    placeholder="Tell the story behind this product..."
-                  />
-                </div>
-
-                {/* Olfactive Notes / Features */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Top Notes / Primary Features
-                    </label>
-                    <input
-                      type="text"
-                      name="topNotes"
-                      value={formData.topNotes}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., Shea butter, Honey"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Middle Notes / Secondary Features
-                    </label>
-                    <input
-                      type="text"
-                      name="middleNotes"
-                      value={formData.middleNotes}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., Floral, Nut, Spice"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Base Notes / Core Features
-                    </label>
-                    <input
-                      type="text"
-                      name="baseNotes"
-                      value={formData.baseNotes}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., Cedar, Musk, Vanilla"
-                    />
-                  </div>
-                </div>
-
-                {/* Product Details */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Price (£) *
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      required
-                      min="0"
-                      step="0.01"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Stock *
-                    </label>
-                    <input
-                      type="number"
-                      name="stock"
-                      value={formData.stock}
-                      onChange={handleInputChange}
-                      required
-                      min="0"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Diameter/Width
-                    </label>
-                    <input
-                      type="text"
-                      name="diameter"
-                      value={formData.diameter}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., 3.11 inches"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Height
-                    </label>
-                    <input
-                      type="text"
-                      name="height"
-                      value={formData.height}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., 3.66 inches"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Net Weight
-                    </label>
-                    <input
-                      type="text"
-                      name="netWeight"
-                      value={formData.netWeight}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., 250g"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Burn Time / Duration
-                    </label>
-                    <input
-                      type="text"
-                      name="burnTime"
-                      value={formData.burnTime}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                      placeholder="e.g., 80 hours"
-                    />
-                  </div>
-
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Status *
-                    </label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    >
-                      {statuses.map(status => (
-                        <option key={status} value={status}>{status}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Features */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Key Features
-                  </label>
-                  <input
-                    type="text"
-                    name="features"
-                    value={Array.isArray(formData.features) ? formData.features.join(', ') : formData.features}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                    placeholder="e.g., Cruelty-Free & Vegan, Clean Burn Cotton Wicks, Made in USA (separate with commas)"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Separate multiple features with commas</p>
-                </div>
-
-                <div className="flex space-x-3 pt-4 border-t">
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-6 py-3 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
-                  >
-                    {editingProduct ? 'Update Product' : 'Add Product'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <AddProductForm products={products} setProducts={setProducts} setShowModal={setShowModal} setFormData={setFormData} formData={formData} editingProduct={editingProduct} setEditingProduct={setEditingProduct} />
         </div>
       )}
     </div>

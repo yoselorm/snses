@@ -5,13 +5,12 @@ import {
     ShoppingCart, 
     Package, 
     Users, 
-    BarChart3, 
     CreditCard, 
     Truck, 
-    HelpCircle, 
     Settings, 
     LogOut,
     TrendingUp,
+    Component,
   } from 'lucide-react';
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
@@ -25,7 +24,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
       { id: 'products', icon: Package, label: 'Products', badge: null, path: '/dashboard/products'},
       { id: 'customers', icon: Users, label: 'Customers', badge: null, path: '/dashboard/customers' },
       { id: 'transactions', icon: CreditCard, label: 'Transactions', badge: null, path: '/dashboard/transactions' },
-      { id: 'shipment', icon: Truck, label: 'Shipment', badge: null, path: '/dashboard/shipment'},
+      { id: 'categories', icon: Component, label: 'Categories', badge: null, path: '/dashboard/categories'},
     ];
   
     const bottomItems = [
